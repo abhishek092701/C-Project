@@ -2,10 +2,75 @@
 #include<iomanip>
 #include<fstream>
 #include<string>
+#include<cctype>
+
 using namespace std;
+
 const int Seats = 40;
 const int Max_Bus = 10;
 const int Max_Tickets = 400;
+
+class SeatAlreadyBookedException
+{
+private:
+    string message;
+public:
+    SeatAlreadyBookedException(string msg)
+    {
+        message = msg;
+    }
+    string getMessage() const
+    {
+        return message;
+    }
+};
+class Ticket
+{
+private:
+    int ticketNo;
+    string busNo;
+    int seatNo;
+    string passengerName;
+    double fare;
+
+public:
+    Ticket()
+    {
+        ticketNo = 0;
+        busNo = "";
+        seatNo = 0;
+        passengerName = "";
+        fare = 0;
+    }
+    Ticket(int t, string b, int s, string p, double f)
+    {
+        ticketNo = t;
+        busNo = b;
+        seatNo = s;
+        passengerName = p;
+        fare = f;
+    }
+    int getTicketNo()
+    {
+        return ticketNo;
+    }
+    string getBusNo()
+    {
+        return busNo;
+    }
+    int getSeatNo()
+    {
+        return seatNo;
+    }
+    string getPassengerName()
+    {
+        return passengerName;
+    }
+    double getFare()
+    {
+        return fare;
+    }
+};
 class Bus{
     protected:
         string busNo;
@@ -15,13 +80,21 @@ class Bus{
         bool seatBooked[Seats];
         string passenger[Seats];
     public:
+        Bus();
         void menu();
         void add_bus();
         void inputBus();
         virtual double farePerSeat() = 0;
         void list_buses();
-        void seatmap();
+        void showSeatMap();
         void viewseat_map();
+        void bookSeat(int seat, string name);
+        void cancelSeat(int seat);
+        void cancelTicket();
+        void searchTicket();
+        void bookTicket();
+        void saveData();
+        void loadData();
         string getBusNo()
         {
             return busNo;
@@ -50,7 +123,7 @@ class NormalBus : public Bus
         }
         double farePerSeat()
         {
-            return 0;
+            return distanceKm * rate;
         }
 };
 class DeluxeBus : public Bus
@@ -66,13 +139,16 @@ class DeluxeBus : public Bus
         }
         double farePerSeat()
         {
-            return 0;
+            return (distanceKm * rate) + acCharge;
         }
 };
 NormalBus normalBuses[Max_Bus];
 DeluxeBus deluxeBuses[Max_Bus];
 int normalCount = 0;
 int deluxeCount = 0;
+Ticket tickets[Max_Tickets];
+int ticketCount = 0;
+int nextTicketNo = 1;
 Bus :: Bus()
 {
     busNo = "";
@@ -84,6 +160,24 @@ Bus :: Bus()
         seatBooked[i] = false;
         passenger[i] = "";
     }
+}
+bool validName(string name)
+{
+    if(name.empty())
+        return false;
+    bool hasLetter = false;
+    for(int i = 0; i < name.length(); i++)
+    {
+        if(isalpha(name[i]))
+        {
+            hasLetter = true;
+        }
+        else if(name[i] != ' ')
+        {
+            return false;
+        }
+    }
+    return hasLetter;
 }
 void Bus :: list_buses()
 {
@@ -124,44 +218,58 @@ void Bus :: list_buses()
 }
 void Bus :: add_bus()
 {
-    system("cls");
-    int choice;
-    cout<<"1. Normal Bus";
-    cout<<"2. Deluxe Bus";
-    cout<<"3. Exit";
-    cout<<"Enter your Choice : ";
-    cin>>choice;
-    switch(choice)
+    while(true)
     {
-        case 1:
-            if(normalCount >= Max_Bus)
-            {
-                cout<<"\nNormal Bus limit reached!\n";
+        system("cls");
+        int choice;
+        cout<<"ADD BUS"<<endl;
+        cout<<"1. Normal Bus"<<endl;
+        cout<<"2. Deluxe Bus"<<endl;
+        cout<<"3. Exit"<<endl;
+        cout<<"Enter your Choice : ";
+        if(!(cin >> choice))
+        {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout<<"Invalid choice! Please enter a number.\n";
+            system("pause");
+            return;
+        }
+        switch(choice)
+        {
+            case 1:
+                if(normalCount >= Max_Bus)
+                {
+                    cout<<"\nNormal Bus limit reached!\n";
+                    system("pause");
+                    return;
+                }
+                normalBuses[normalCount].inputBus();
+                normalCount++;
+                saveData();
+                cout<<"\nNormal Bus added successfully!\n";
                 system("pause");
-                return;
-            }
-            normalBuses[normalCount].inputBus();
-            normalCount++;
-            cout<<"\nNormal Bus added successfully!\n";
-            system("pause");
-            break;
-        case 2:
-            if(deluxeCount >= Max_Bus)
-            {
-                cout<<"\nDeluxe Bus limit reached!\n";
+                break;
+            case 2:
+                if(deluxeCount >= Max_Bus)
+                {
+                    cout<<"\nDeluxe Bus limit reached!\n";
+                    system("pause");
+                    return;
+                }
+                deluxeBuses[deluxeCount].inputBus();
+                deluxeCount++;
+                saveData();
+                cout<<"\nDeluxe Bus added successfully!\n";
                 system("pause");
+                break ;
+            case 3:
                 return;
-            }
-            deluxeBuses[deluxeCount].inputBus();
-            deluxeCount++;
-            cout<<"\nDeluxe Bus added successfully!\n";
-            system("pause");
-            break ;
-        case 3:
-            exit(0);
-        default:
-            cout<<"Invalid Choice! Please Try Again";
-            system("pause");
+            default:
+                cout<<endl<<"Invalid Choice! Please Try Again"<<endl;
+                system("pause");
+                continue;
+        }
     }
 }
 void Bus :: inputBus()
@@ -170,7 +278,6 @@ void Bus :: inputBus()
     {
         cout<<"\nEnter Bus Number: ";
         cin>>busNo;
-
         if(busNo.empty())
         {
             cout<<"Bus Number cannot be empty!\n";
@@ -185,7 +292,6 @@ void Bus :: inputBus()
     {
         cout<<"Enter Route: ";
         getline(cin, route);
-
         if(route.empty())
         {
             cout<<"Route cannot be empty!\n";
@@ -221,7 +327,7 @@ void Bus :: inputBus()
         }
     }
 }
-void Bus :: seat_map()
+void Bus :: showSeatMap()
 {
     system("cls");
     cout<<endl;
@@ -268,7 +374,14 @@ void Bus :: viewseat_map()
     cout<<"2. Deluxe Bus\n";
     cout<<"3. Back\n";
     cout<<"Enter your choice: ";
-    cin>>choice;
+    if(!(cin >> choice))
+    {
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cout<<"Invalid input! Please enter a number.\n";
+        system("pause");
+        return;
+    }
     if(choice == 1)
     {
         if(normalCount == 0)
@@ -284,7 +397,14 @@ void Bus :: viewseat_map()
         }
         int busChoice;
         cout<<"\nSelect Bus: ";
-        cin>>busChoice;
+        if(!(cin >> busChoice))
+        {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout<<"Invalid input! Please enter a number.\n";
+            system("pause");
+            return;
+        }
         if(busChoice < 1 || busChoice > normalCount)
         {
             cout<<"Invalid bus choice!\n";
@@ -308,7 +428,14 @@ void Bus :: viewseat_map()
         }
         int busChoice;
         cout<<"\nSelect Bus: ";
-        cin>>busChoice;
+        if(!(cin >> busChoice))
+        {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout<<"Invalid input! Please enter a number.\n";
+            system("pause");
+            return;
+        }
         if(busChoice < 1 || busChoice > deluxeCount)
         {
             cout<<"Invalid bus choice!\n";
@@ -327,21 +454,471 @@ void Bus :: viewseat_map()
         system("pause");
     }
 }
+void Bus :: bookSeat(int seat, string name)
+{
+    if(seat < 1 || seat > Seats)
+    {
+        cout<<"\nInvalid seat number!\n";
+        cout<<"\nSeat number must be between 1 and 40.";
+        return;
+    }
+    if(seatBooked[seat - 1])
+    {
+        throw SeatAlreadyBookedException("Seat " + to_string(seat) + " is already booked!");
+    }
+    seatBooked[seat - 1] = true;
+    passenger[seat - 1] = name;
+    cout<<"TICKET BOOKED";
+    cout<<"Seat Number    : " << seat << endl;
+    cout<<"Passenger Name : " << name << endl;
+}
+void Bus :: cancelSeat(int seat)
+{
+    if(seat < 1 || seat > Seats)
+    {
+        cout<<"\nInvalid seat number!\n";
+        return;
+    }
+    if(!seatBooked[seat - 1])
+    {
+        cout<<"\nThis seat is not booked!\n";
+        return;
+    }
+    seatBooked[seat - 1] = false;
+    passenger[seat - 1] = "";
+    cout<<"\nSeat "<<seat<<" has been cancelled successfully!\n";
+}
+void Bus :: cancelTicket()
+{
+    system("cls");
+    if(ticketCount == 0)
+    {
+        cout<<"\nNo tickets available to cancel!\n";
+        system("pause");
+        return;
+    }
+    int ticketNo;
+    cout<<"\nCANCEL TICKET \n";
+    cout<<"Enter Ticket Number: ";
+    if(!(cin >> ticketNo))
+    {
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cout<<"Invalid input! Please enter a number.\n";
+        system("pause");
+        return;
+    }
+    int ticketIndex = -1;
+    for(int i = 0; i < ticketCount; i++)
+    {
+        if(tickets[i].getTicketNo() == ticketNo)
+        {
+            ticketIndex = i;
+            break;
+        }
+    }
+    if(ticketIndex == -1)
+    {
+        cout<<"\nTicket not found!\n";
+        system("pause");
+        return;
+    }
+    string busNo = tickets[ticketIndex].getBusNo();
+    int seatNo = tickets[ticketIndex].getSeatNo();
+    bool seatCancelled = false;
+    for(int i = 0; i < normalCount; i++)
+    {
+        if(normalBuses[i].getBusNo() == busNo)
+        {
+            normalBuses[i].cancelSeat(seatNo);
+            seatCancelled = true;
+            break;
+        }
+    }
+    if(!seatCancelled)
+    {
+        for(int i = 0; i < deluxeCount; i++)
+        {
+            if(deluxeBuses[i].getBusNo() == busNo)
+            {
+                deluxeBuses[i].cancelSeat(seatNo);
+                seatCancelled = true;
+                break;
+            }
+        }
+    }
+    if(!seatCancelled)
+    {
+        cout<<"\nBus associated with this ticket was not found!\n";
+        system("pause");
+        return;
+    }
+    for(int i = ticketIndex; i < ticketCount - 1; i++)
+    {
+        tickets[i] = tickets[i + 1];
+    }
+    ticketCount--;
+    saveData();
+    cout<<"\nTicket "<<ticketNo<<" cancelled successfully!\n";
+    system("pause");
+}
+void Bus :: searchTicket()
+{
+    system("cls");
+    if(ticketCount == 0)
+    {
+        cout<<"\nNo tickets available!\n";
+        system("pause");
+        return;
+    }
+    int ticketNo;
+    cout<<"\n SEARCH TICKET \n";
+    cout<<"Enter Ticket Number: ";
+    if(!(cin >> ticketNo))
+    {
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cout<<"Invalid input! Please enter a number.\n";
+        system("pause");
+        return;
+    }
+    int ticketIndex = -1;
+    for(int i = 0; i < ticketCount; i++)
+    {
+        if(tickets[i].getTicketNo() == ticketNo)
+        {
+            ticketIndex = i;
+            break;
+        }
+    }
+    if(ticketIndex == -1)
+    {
+        cout<<"\nTicket not found!\n";
+        system("pause");
+        return;
+    }
+    cout<<"\n TICKET DETAILS \n";
+    cout<<"Ticket Number   : "<<tickets[ticketIndex].getTicketNo()<<endl;
+    cout<<"Bus Number      : "<<tickets[ticketIndex].getBusNo()<<endl;
+    cout<<"Seat Number     : "<<tickets[ticketIndex].getSeatNo()<<endl;
+    cout<<"Passenger Name  : "<<tickets[ticketIndex].getPassengerName()<<endl;
+    cout<<"Fare            : "<<tickets[ticketIndex].getFare()<<endl;
+    system("pause");
+}
+void Bus :: saveData()
+{
+    ofstream file("bus_data.txt");
+    if(!file)
+    {
+        cout<<"\nError opening file for saving!\n";
+        return;
+    }
+    file<<normalCount << endl;
+    file<<deluxeCount << endl;
+    for(int i = 0; i < normalCount; i++)
+    {
+        file<<normalBuses[i].busNo << endl;
+        file<<normalBuses[i].route << endl;
+        file<<normalBuses[i].distanceKm << endl;
+        file<<normalBuses[i].departure << endl;
+        for(int j = 0; j < Seats; j++)
+        {
+            file << normalBuses[i].seatBooked[j] << endl;
+            file << normalBuses[i].passenger[j] << endl;
+        }
+    }
+    for(int i = 0; i < deluxeCount; i++)
+    {
+        file<<deluxeBuses[i].busNo << endl;
+        file<<deluxeBuses[i].route << endl;
+        file<<deluxeBuses[i].distanceKm << endl;
+        file<<deluxeBuses[i].departure << endl;
+        for(int j = 0; j < Seats; j++)
+        {
+            file << deluxeBuses[i].seatBooked[j] << endl;
+            file << deluxeBuses[i].passenger[j] << endl;
+        }
+    }
+    file<<ticketCount << endl;
+    file<<nextTicketNo << endl;
+    for(int i = 0; i < ticketCount; i++)
+    {
+        file<<tickets[i].getTicketNo() << endl;
+        file<<tickets[i].getBusNo() << endl;
+        file<<tickets[i].getSeatNo() << endl;
+        file<<tickets[i].getPassengerName() << endl;
+        file<<tickets[i].getFare() << endl;
+    }
+    file.close();
+    cout<<"\nData saved successfully!\n";
+}
+void Bus :: loadData()
+{
+    ifstream file("bus_data.txt");
+    if(!file)
+    {
+        return;
+    }
+    file>>normalCount;
+    file>>deluxeCount;
+    file.ignore(1000, '\n');
+    for(int i = 0; i < normalCount; i++)
+    {
+        getline(file, normalBuses[i].busNo);
+        getline(file, normalBuses[i].route);
+        file>>normalBuses[i].distanceKm;
+        file.ignore(1000, '\n');
+        getline(file, normalBuses[i].departure);
+        for(int j = 0; j < Seats; j++)
+        {
+            file >> normalBuses[i].seatBooked[j];
+            file.ignore(1000, '\n');
+            getline(file, normalBuses[i].passenger[j]);
+        }
+    }
+    for(int i = 0; i < deluxeCount; i++)
+    {
+        getline(file, deluxeBuses[i].busNo);
+        getline(file, deluxeBuses[i].route);
+        file>>deluxeBuses[i].distanceKm;
+        file.ignore(1000, '\n');
+        getline(file, deluxeBuses[i].departure);
+        for(int j = 0; j < Seats; j++)
+        {
+            file >> deluxeBuses[i].seatBooked[j];
+            file.ignore(1000, '\n');
+            getline(file, deluxeBuses[i].passenger[j]);
+        }
+    }
+    file>>ticketCount;
+    file>>nextTicketNo;
+    file.ignore(1000, '\n');
+    for(int i = 0; i < ticketCount; i++)
+    {
+        int ticketNo;
+        string busNo;
+        int seatNo;
+        string passengerName;
+        double fare;
+        file>>ticketNo;
+        file.ignore(1000, '\n');
+        getline(file, busNo);
+        file>>seatNo;
+        file.ignore(1000, '\n');
+        getline(file, passengerName);
+        file>>fare;
+        file.ignore(1000, '\n');
+        tickets[i] = Ticket(ticketNo,busNo,seatNo,passengerName,fare);
+    }
+    file.close();
+}
+void Bus :: bookTicket()
+{
+    system("cls");
+    if(normalCount == 0 && deluxeCount == 0)
+    {
+        cout<<"\nNo buses available!\n";
+        system("pause");
+        return;
+    }
+    int type;
+    cout<<"\n========== BOOK TICKET ==========\n";
+    cout<<"1. Normal Bus\n";
+    cout<<"2. Deluxe Bus\n";
+    cout<<"3. Back\n";
+    cout<<"Enter your choice: ";
+    if(!(cin >> type))
+    {
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cout<<"Invalid input! Please enter a number.\n";
+        system("pause");
+        return;
+    }
+    if(type == 1)
+    {
+        if(normalCount == 0)
+        {
+            cout<<"\nNo Normal Bus available!\n";
+            system("pause");
+            return;
+        }
+        cout<<"\nAvailable Normal Buses:\n";
+        for(int i = 0; i < normalCount; i++)
+        {
+            cout<<i + 1 << ". "<< normalBuses[i].getBusNo()<< " - "<< normalBuses[i].getRoute()<< endl;
+        }
+        int busChoice;
+        cout<<"\nSelect Bus: ";
+        if(!(cin >> busChoice))
+        {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout<<"Invalid input! Please enter a number.\n";
+            system("pause");
+            return;
+        }
+        if(busChoice < 1 || busChoice > normalCount)
+        {
+            cout<<"Invalid bus choice!\n";
+            system("pause");
+            return;
+        }
+        Bus &selectedBus = normalBuses[busChoice - 1];
+        selectedBus.showSeatMap();
+        int seat;
+        cout<<"\nEnter Seat Number: ";
+        if(!(cin >> seat))
+        {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout<<"Invalid input! Please enter a number.\n";
+            system("pause");
+            return;
+        }
+        cin.ignore(1000, '\n');
+        string name;
+        cout<<"Enter Passenger Name: ";
+        getline(cin, name);
+        if(!validName(name))
+        {
+            cout<<"Invalid Passenger Name! Only letters and spaces are allowed";
+            system("pause");
+            return;
+        }
+        if(ticketCount >= Max_Tickets)
+        {
+            cout<<"\nTicket limit reached! Cannot book more tickets.\n";
+            system("pause");
+            return;
+        }
+        try
+        {
+            selectedBus.bookSeat(seat, name);
+            double fare = selectedBus.farePerSeat();
+            tickets[ticketCount] = Ticket(nextTicketNo,selectedBus.getBusNo(),seat,name,fare);
+            cout<<"\nTicket Number : "<<nextTicketNo<<endl;
+            cout<<"Bus Number    : "<<selectedBus.getBusNo()<<endl;
+            cout<<"Seat Number   : "<<seat<<endl;
+            cout<<"Passenger     : "<<name<<endl;
+            cout<<"Fare          : "<<fare<<endl;
+            ticketCount++;
+            nextTicketNo++;
+            saveData();
+        }
+        catch(SeatAlreadyBookedException e)
+        {
+            cout<<e.getMessage()<<endl;
+        }
+    }
+    else if(type == 2)
+    {
+        if(deluxeCount == 0)
+        {
+            cout<<"\nNo Deluxe Bus available!\n";
+            system("pause");
+            return;
+        }
+        cout<<"\nAvailable Deluxe Buses:\n";
+        for(int i = 0; i < deluxeCount; i++)
+        {
+            cout << i + 1 << ". "<< deluxeBuses[i].getBusNo()<< " - "<< deluxeBuses[i].getRoute()<< endl;
+        }
+        int busChoice;
+        cout<<"\nSelect Bus: ";
+        if(!(cin >> busChoice))
+        {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout<<"Invalid input! Please enter a number.\n";
+            system("pause");
+            return;
+        }
+        if(busChoice < 1 || busChoice > deluxeCount)
+        {
+            cout<<"Invalid bus choice!\n";
+            system("pause");
+            return;
+        }
+        Bus &selectedBus = deluxeBuses[busChoice - 1];
+        selectedBus.showSeatMap();
+        int seat;
+        cout<<"\nEnter Seat Number: ";
+        if(!(cin >> seat))
+        {
+            cin.clear();
+            cin.ignore(1000, '\n');
+            cout<<"Invalid input! Please enter a number.\n";
+            system("pause");
+            return;
+        }
+        cin.ignore(1000, '\n');
+        string name;
+        cout<<"Enter Passenger Name: ";
+        getline(cin, name);
+        if(!validName(name))
+        {
+            cout<<"Invalid Passenger Name! Only letters and spaces are allowed";
+            system("pause");
+            return;
+        }
+        if(ticketCount >= Max_Tickets)
+        {
+            cout<<"\nTicket limit reached! Cannot book more tickets.\n";
+            system("pause");
+            return;
+        }
+        try
+        {
+            selectedBus.bookSeat(seat, name);
+            double fare = selectedBus.farePerSeat();
+            tickets[ticketCount] = Ticket(nextTicketNo,selectedBus.getBusNo(),seat,name,fare);
+            cout<<"\nTicket Number : "<<nextTicketNo<<endl;
+            cout<<"Bus Number    : "<<selectedBus.getBusNo()<<endl;
+            cout<<"Seat Number   : "<<seat<<endl;
+            cout<<"Passenger     : "<<name<<endl;
+            cout<<"Fare          : "<<fare<<endl;
+            ticketCount++;
+            nextTicketNo++;
+            saveData();
+        }
+        catch(SeatAlreadyBookedException e)
+        {
+            cout<<e.getMessage()<<endl;
+        }
+    }
+    else if(type == 3)
+    {
+        return;
+    }
+    else
+    {
+        cout<<"\nInvalid choice!\n";
+    }
+    system("pause");
+}
 void Bus ::menu()
 {
     p:
     system("cls");
     int choice;
-    cout<<"Menu";
-    cout<<"1. Add Bus";
-    cout<<"2. List Buses";
-    cout<<"3. View Seat Map";
-    cout<<"4. Book ticket";
-    cout<<"5. Cancel Ticket";
-    cout<<"6. Search Ticket";
-    cout<<"7. Save & Exit";
+    cout<<"Menu"<<endl;
+    cout<<"1. Add Bus"<<endl;
+    cout<<"2. List Buses"<<endl;
+    cout<<"3. View Seat Map"<<endl;
+    cout<<"4. Book ticket"<<endl;
+    cout<<"5. Cancel Ticket"<<endl;
+    cout<<"6. Search Ticket"<<endl;
+    cout<<"7. Save & Exit"<<endl;
     cout<<"Enter Your choice: ";
-    cin>>choice;
+    if(!(cin >> choice))
+    {
+        cin.clear();
+        cin.ignore(1000, '\n');
+        cout<<"Invalid choice! Please enter a number.\n";
+        system("pause");
+        goto p;
+    }
     switch(choice)
     {
         case 1:
@@ -354,21 +931,28 @@ void Bus ::menu()
             viewseat_map();
             break;
         case 4:
+            bookTicket();
             break;
         case 5:
+            cancelTicket();
             break;
         case 6:
+            searchTicket();
             break;
         case 7:
+            saveData();
+            cout<<"\nExiting program...\n";
             exit(0);
         default:
-            cout<<"Invalid Choice! Please Try Again";
+            cout<<endl<<"Invalid Choice! Please Try Again"<<endl;
+            system("pause");
     }
     goto p;
 }
 int main()
 {
-    Bus b;
+    NormalBus b;
+    b.loadData();
     b.menu();
     return 0;
 }
