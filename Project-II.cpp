@@ -174,36 +174,48 @@ bool validName(string name)
     }
     return hasLetter;
 }
-bool validBusNumber(string busNo)
+bool validBusNumber(string s)
 {
-    if(busNo.empty())
+    string x = "";
+    for(char c : s)
+        if(c != ' ')
+            x += c;
+    if(x.length() < 6 || x.length() > 9)
         return false;
-    for(int i = 0; i < busNo.length(); i++)
+    if(!isalpha(x[0]) || !isalpha(x[1]) || !isdigit(x[2]) || !isalpha(x[3]) || !isalpha(x[4]))
+        return false;
+    for(int i = 5; i < x.length(); i++)
     {
-        if(!isalnum(busNo[i]) && busNo[i] != ' ' && busNo[i] != '-')
-        {
+        if(!isdigit(x[i]))
             return false;
+    }
+    bool allZero = true;
+    for(int i = 5; i < x.length(); i++)
+    {
+        if(x[i] != '0')
+        {
+            allZero = false;
+            break;
         }
     }
+    if(allZero)
+        return false;
     return true;
 }
-bool validRoute(string route)
+bool validRoute(string s)
 {
-    if(route.empty())
-        return false;
-    bool hasLetter = false;
-    for(int i = 0; i < route.length(); i++)
+    int d=0;
+    bool letter=false;
+    for(char c:s)
     {
-        if(isalpha(route[i]))
-        {
-            hasLetter = true;
-        }
-        else if(route[i] != ' ' && route[i] != '-')
-        {
+        if(isalpha(c))
+            letter=true;
+        else if(c=='-')
+            d++;
+        else if(c!=' ')
             return false;
-        }
     }
-    return hasLetter;
+    return d==1 && letter && s.front()!='-' && s.back()!='-';
 }
 void Bus :: list_buses()
 {
@@ -301,16 +313,14 @@ void Bus :: inputBus()
     while(true)
     {
         cout<<"Enter Bus Number: ";
-        cin>>busNo;
+        cin>>ws;
+        getline(cin, busNo);
         if(validBusNumber(busNo))
         {
             break;
         }
-        cout<<"Invalid Bus Number! Only letters, numbers, spaces and - are allowed.\n";
-        cin.clear();
-        cin.ignore(1000,'\n');
+        cout<<"Invalid Bus Number!\n";
     }
-    cin.ignore(1000,'\n');
     while(true)
     {
         cout<<"Enter Route: ";
@@ -320,8 +330,6 @@ void Bus :: inputBus()
             break;
         }
         cout<<"Invalid Route! Only letters, spaces and - are allowed.\n";
-        cin.clear();
-        cin.ignore(1000,'\n');
     }
     while(true)
     {
