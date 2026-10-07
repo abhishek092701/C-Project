@@ -202,6 +202,20 @@ bool validBusNumber(string s)
         return false;
     return true;
 }
+bool duplicateBusNumber(string busNo)
+{
+    for(int i = 0; i < normalCount; i++)
+    {
+        if(normalBuses[i].getBusNo() == busNo)
+            return true;
+    }
+    for(int i = 0; i < deluxeCount; i++)
+    {
+        if(deluxeBuses[i].getBusNo() == busNo)
+            return true;
+    }
+    return false;
+}
 bool validRoute(string s)
 {
     int d=0;
@@ -269,7 +283,7 @@ void Bus :: add_bus()
             cin.ignore(1000, '\n');
             cout<<"Invalid choice! Please enter a number.\n";
             system("pause");
-            return;
+            continue;
         }
         switch(choice)
         {
@@ -315,11 +329,17 @@ void Bus :: inputBus()
         cout<<"Enter Bus Number: ";
         cin>>ws;
         getline(cin, busNo);
-        if(validBusNumber(busNo))
+        if(!validBusNumber(busNo))
         {
-            break;
+            cout<<"Invalid Bus Number!\n";
+            continue;
         }
-        cout<<"Invalid Bus Number!\n";
+        if(duplicateBusNumber(busNo))
+        {
+            cout<<"Bus Number already exists! Please enter a different Bus Number.\n";
+            continue;
+        }
+        break;
     }
     while(true)
     {
@@ -334,7 +354,7 @@ void Bus :: inputBus()
     while(true)
     {
         cout<<"Enter Distance (KM): ";
-        if(cin >> distanceKm && distanceKm > 0)
+        if(cin>>distanceKm && distanceKm > 0 && distanceKm <=5000)
         {
             break;
         }
@@ -543,9 +563,15 @@ void Bus :: cancelTicket()
             system("pause");
             continue;
         }
+        cout<<"TICKET DETAILS"<<endl;
+        cout<<"Ticket No.     : " << tickets[ticketIndex].getTicketNo() << endl;
+        cout<<"Bus No.        : " << tickets[ticketIndex].getBusNo() << endl;
+        cout<<"Seat No.       : " << tickets[ticketIndex].getSeatNo() << endl;
+        cout<<"Passenger Name : " << tickets[ticketIndex].getPassengerName() << endl;
+        cout<<"Fare           : Rs. " << fixed << setprecision(2) << tickets[ticketIndex].getFare() << endl;
         char confirm;
         cout<<"\nAre you sure you want to cancel this ticket? (Y/N): ";
-        cin >> confirm;
+        cin>>confirm;
         if(confirm == 'N' || confirm == 'n')
         {
             cout<<"\nTicket cancellation cancelled.\n";
@@ -754,6 +780,17 @@ void Bus :: loadData()
     }
     file>>normalCount;
     file>>deluxeCount;
+    if(normalCount < 0 || normalCount > Max_Bus ||
+       deluxeCount < 0 || deluxeCount > Max_Bus)
+    {
+        cout<<"\nInvalid bus data found in file!\n";
+        normalCount = 0;
+        deluxeCount = 0;
+        ticketCount = 0;
+        nextTicketNo = 1;
+        file.close();
+        return;
+    }
     file.ignore(1000, '\n');
     for(int i = 0; i < normalCount; i++)
     {
@@ -763,7 +800,7 @@ void Bus :: loadData()
         file.ignore(1000, '\n');
         for(int j = 0; j < Seats; j++)
         {
-            file >> normalBuses[i].seatBooked[j];
+            file>>normalBuses[i].seatBooked[j];
             file.ignore(1000, '\n');
             getline(file, normalBuses[i].passenger[j]);
         }
@@ -782,6 +819,14 @@ void Bus :: loadData()
         }
     }
     file>>ticketCount;
+    if(ticketCount < 1 || ticketCount > Max_Tickets)
+    {
+        cout<<"\nInvalid ticket data found in file!\n";
+        ticketCount = 0;
+        nextTicketNo = 1;
+        file.close();
+        return;
+    }
     file>>nextTicketNo;
     file.ignore(1000, '\n');
     for(int i = 0; i < ticketCount; i++)
