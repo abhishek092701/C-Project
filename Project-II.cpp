@@ -174,15 +174,27 @@ bool validName(string name)
     }
     return hasLetter;
 }
+
 bool validBusNumber(string s)
 {
     string x = "";
-    for(char c : s)
-        if(c != ' ')
-            x += c;
+    for(int i = 0; i < s.length(); i++)
+    {
+        if(s[i] != ' ')
+        {
+            x = x + s[i];
+        }
+    }
     if(x.length() < 6 || x.length() > 9)
         return false;
-    if(!isalpha(x[0]) || !isalpha(x[1]) || !isdigit(x[2]) || !isalpha(x[3]) || !isalpha(x[4]))
+    if(!isalpha(x[0]) || !isalpha(x[1]))
+        return false;
+    if(!isdigit(x[2]))
+        return false;
+    if(!isalpha(x[3]) || !isalpha(x[4]))
+        return false;
+    int lastNumberLength = x.length() - 5;
+    if(lastNumberLength < 1 || lastNumberLength > 4)
         return false;
     for(int i = 5; i < x.length(); i++)
     {
@@ -234,34 +246,32 @@ bool validRoute(string s)
 void Bus :: list_buses()
 {
     system("cls");
-    cout<<"\n NORMAL BUSES \n";
+    cout<<"\n \t\t\t\t\t\t\t\t\tNORMAL BUSES \n";
     if(normalCount == 0)
     {
-        cout<<"No Normal Bus available.\n";
+        cout<<"\t\t\t\t\t\t\t\tNo Normal Bus available.\n";
     }
     else
     {
         for(int i = 0; i < normalCount; i++)
         {
-            cout<<"\nBus No       : "<<normalBuses[i].getBusNo();
-            cout<<"\nRoute        : "<<normalBuses[i].getRoute();
-            cout<<"\nDistance     : "<<normalBuses[i].getDistance() << " KM";
-            cout<<"\n";
+            cout<<"\n\t\t\t\t\tBus No       : "<<normalBuses[i].getBusNo();
+            cout<<"\n\t\t\t\t\tRoute        : "<<normalBuses[i].getRoute();
+            cout<<"\n\t\t\t\t\tDistance     : "<<normalBuses[i].getDistance() << " KM\n";
         }
     }
-    cout<<"\n DELUXE BUSES \n";
+    cout<<"\n \t\t\t\t\t\t\t\t\tDELUXE BUSES \n";
     if(deluxeCount == 0)
     {
-        cout << "No Deluxe Bus available.\n";
+        cout<<"\t\t\t\t\t\t\t\tNo Deluxe Bus available.\n";
     }
     else
     {
         for(int i = 0; i < deluxeCount; i++)
         {
-            cout<<"\nBus No       : "<<deluxeBuses[i].getBusNo();
-            cout<<"\nRoute        : "<<deluxeBuses[i].getRoute();
-            cout<<"\nDistance     : "<<deluxeBuses[i].getDistance()<<" KM";
-            cout<<"\n";
+            cout<<"\n\t\t\t\t\t\t\t\tBus No   : "<<deluxeBuses[i].getBusNo();
+            cout<<"\n\t\t\t\t\t\t\t\tRoute    : "<<deluxeBuses[i].getRoute();
+            cout<<"\n\t\t\t\t\t\t\t\tDistance : "<<deluxeBuses[i].getDistance()<<" KM\n";
         }
     }
     system("pause");
@@ -272,16 +282,16 @@ void Bus :: add_bus()
     {
         system("cls");
         int choice;
-        cout<<"ADD BUS"<<endl;
-        cout<<"1. Normal Bus"<<endl;
-        cout<<"2. Deluxe Bus"<<endl;
-        cout<<"3. Exit"<<endl;
-        cout<<"Enter your Choice : ";
+        cout<<"\t\t\t\t\t\t\t\t\tADD BUS"<<endl<<endl;
+        cout<<"\t\t\t\t\t\t\t\t1. Normal Bus"<<endl;
+        cout<<"\t\t\t\t\t\t\t\t2. Deluxe Bus"<<endl;
+        cout<<"\t\t\t\t\t\t\t\t3. Exit"<<endl<<endl;
+        cout<<"\t\t\t\t\t\t\t\tEnter your Choice : ";
         if(!(cin >> choice))
         {
             cin.clear();
             cin.ignore(1000, '\n');
-            cout<<"Invalid choice! Please enter a number.\n";
+            cout<<"\t\t\t\t\t\t\t\tInvalid choice! Please enter a number.\n";
             system("pause");
             continue;
         }
@@ -290,33 +300,33 @@ void Bus :: add_bus()
             case 1:
                 if(normalCount >= Max_Bus)
                 {
-                    cout<<"\nNormal Bus limit reached!\n";
+                    cout<<"\n\t\t\t\t\t\t\t\tNormal Bus limit reached!\n";
                     system("pause");
                     return;
                 }
                 normalBuses[normalCount].inputBus();
                 normalCount++;
                 saveData();
-                cout<<"\nNormal Bus added successfully!\n";
+                cout<<"\n\t\t\t\t\t\t\t\tNormal Bus added successfully!\n";
                 system("pause");
                 break;
             case 2:
                 if(deluxeCount >= Max_Bus)
                 {
-                    cout<<"\nDeluxe Bus limit reached!\n";
+                    cout<<"\n\t\t\t\t\t\t\t\tDeluxe Bus limit reached!\n";
                     system("pause");
                     return;
                 }
                 deluxeBuses[deluxeCount].inputBus();
                 deluxeCount++;
                 saveData();
-                cout<<"\nDeluxe Bus added successfully!\n";
+                cout<<"\n\t\t\t\t\t\t\t\tDeluxe Bus added successfully!\n";
                 system("pause");
                 break ;
             case 3:
                 return;
             default:
-                cout<<endl<<"Invalid Choice! Please Try Again"<<endl;
+                cout<<endl<<"\t\t\t\t\t\t\t\tInvalid Choice! Please Try Again"<<endl;
                 system("pause");
                 continue;
         }
@@ -326,39 +336,39 @@ void Bus :: inputBus()
 {
     while(true)
     {
-        cout<<"Enter Bus Number: ";
+        cout<<"\t\t\t\t\t\t\t\tEnter Bus Number: ";
         cin>>ws;
         getline(cin, busNo);
         if(!validBusNumber(busNo))
         {
-            cout<<"Invalid Bus Number!\n";
+            cout<<"\t\t\t\t\t\t\t\tInvalid Bus Number! Please Enter like a Ba1Pa1234 or Ba 1 Pa 1234.\n";
             continue;
         }
         if(duplicateBusNumber(busNo))
         {
-            cout<<"Bus Number already exists! Please enter a different Bus Number.\n";
+            cout<<"\t\t\t\t\t\t\t\tBus Number already exists! Please enter a different Bus Number.\n";
             continue;
         }
         break;
     }
     while(true)
     {
-        cout<<"Enter Route: ";
+        cout<<"\t\t\t\t\t\t\t\tEnter Route: ";
         getline(cin, route);
         if(validRoute(route))
         {
             break;
         }
-        cout<<"Invalid Route! Only letters, spaces and - are allowed.\n";
+        cout<<"\t\t\t\t\t\t\t\tInvalid Route! Only letters, spaces and - are allowed.\n";
     }
     while(true)
     {
-        cout<<"Enter Distance (KM): ";
+        cout<<"\t\t\t\t\t\t\t\tEnter Distance (KM): ";
         if(cin>>distanceKm && distanceKm > 0 && distanceKm <=5000)
         {
             break;
         }
-        cout<<"Invalid distance! Please enter a value between 1 and 5000 KM.\n";
+        cout<<"\t\t\t\t\t\t\t\tInvalid distance! Please enter a value between 1 and 5000 KM.\n";
         cin.clear();
         cin.ignore(1000, '\n');
     }
@@ -367,32 +377,35 @@ void Bus :: showSeatMap()
 {
     system("cls");
     cout<<endl;
-    cout<<"            BUS SEAT MAP\n";
-    cout<<"       LEFT SIDE          RIGHT SIDE\n\n";
+    cout<<"\t\t\t\t\t\t\t\t\tBUS SEAT MAP\n\n";
+    cout<<"\t\t\t\t\t\t\t\t    LEFT SIDE          RIGHT SIDE\n\n";
     for(int i = 0; i < Seats; i += 4)
     {
+        cout<<"\t\t\t\t\t\t\t\t";
         if(seatBooked[i])
-            cout<<"   [XX] ";
+            cout<<"[XX] ";
         else
-            cout<<"   [" << setw(2) << setfill('0') << i + 1 << "] ";
+            cout<<"[" << setw(2) << setfill('0') << i + 1 << "] ";
+        cout<<"\t";
         if(seatBooked[i + 1])
             cout<<"[XX] ";
         else
             cout<<"[" << setw(2) << setfill('0') << i + 2 << "] ";
-        cout << "      ";
+        cout<<"\t\t";
         if(seatBooked[i + 2])
             cout<<"[" << "XX" << "] ";
         else
             cout<<"[" << setw(2) << setfill('0') << i + 3 << "] ";
+        cout<<"\t";
         if(seatBooked[i + 3])
-            cout << "[" << "XX" << "] ";
+            cout<<"[" << "XX" << "] ";
         else
             cout<<"[" << setw(2) << setfill('0') << i + 4 << "] ";
         cout<<endl;
         setfill(' ');
     }
-    cout<<"XX = Booked\n";
-    cout<<"Number = Available\n";
+    cout<<"\n\t\t\t\t\t\t\t\tXX = Booked\n";
+    cout<<"\t\t\t\t\t\t\t\tNumber = Available\n";
     system("pause");
 }
 void Bus :: viewseat_map()
@@ -402,21 +415,21 @@ void Bus :: viewseat_map()
         system("cls");
         if(normalCount == 0 && deluxeCount == 0)
         {
-            cout<<"\nNo buses available!\n";
+            cout<<"\n\t\t\t\t\t\t\t\tNo buses available!\n";
             system("pause");
             return;
         }
         int choice;
-        cout<<"\n VIEW SEAT MAP \n";
-        cout<<"1. Normal Bus\n";
-        cout<<"2. Deluxe Bus\n";
-        cout<<"3. Back\n";
-        cout<<"Enter your choice: ";
+        cout<<"\n\t\t\t\t\t\t\t\tVIEW SEAT MAP \n\n";
+        cout<<"\t\t\t\t\t\t\t\t1. Normal Bus\n";
+        cout<<"\t\t\t\t\t\t\t\t2. Deluxe Bus\n";
+        cout<<"\t\t\t\t\t\t\t\t3. Back\n\n";
+        cout<<"\t\t\t\t\t\t\t\tEnter your choice: ";
         if(!(cin >> choice))
         {
             cin.clear();
             cin.ignore(1000, '\n');
-            cout<<"Invalid input! Please enter a number.\n";
+            cout<<"\t\t\t\t\t\t\t\tInvalid input! Please enter a number.\n";
             system("pause");
             return;
         }
@@ -424,30 +437,30 @@ void Bus :: viewseat_map()
         {
             if(normalCount == 0)
             {
-                cout<<"\nNo Normal Bus available!\n";
+                cout<<"\n\t\t\t\t\t\t\t\tNo Normal Bus available!\n";
                 system("pause");
                 return;
             }
-            cout<<"\nAvailable Normal Buses:\n";
+            cout<<"\n\t\t\t\t\t\t\t\tAvailable Normal Buses:\n";
             for(int i = 0; i < normalCount; i++)
             {
-                cout<<i + 1 << ". "<< normalBuses[i].getBusNo()<< " - "<< normalBuses[i].getRoute()<< endl;
+                cout<<"\t\t\t\t\t\t\t\t"<<i + 1 << ". "<< normalBuses[i].getBusNo()<< " - "<< normalBuses[i].getRoute()<< endl;
             }
             int busChoice;
-            cout<<"\nSelect Bus: ";
+            cout<<"\n\t\t\t\t\t\t\t\tSelect Bus: ";
             if(!(cin >> busChoice))
             {
                 cin.clear();
                 cin.ignore(1000, '\n');
-                cout<<"Invalid input! Please enter a number.\n";
+                cout<<"\t\t\t\t\t\t\t\tInvalid input! Please enter a number.\n";
                 system("pause");
-                return;
+                continue;
             }
             if(busChoice < 1 || busChoice > normalCount)
             {
-                cout<<"Invalid bus choice!\n";
+                cout<<"\t\t\t\t\t\t\t\tInvalid bus choice!\n";
                 system("pause");
-                return;
+                continue;
             }
             normalBuses[busChoice - 1].showSeatMap();
         }
@@ -455,30 +468,30 @@ void Bus :: viewseat_map()
         {
             if(deluxeCount == 0)
             {
-                cout<<"\nNo Deluxe Bus available!\n";
+                cout<<"\n\t\t\t\t\t\t\t\tNo Deluxe Bus available!\n";
                 system("pause");
                 return;
             }
-            cout<<"\nAvailable Deluxe Buses:\n";
+            cout<<"\n\t\t\t\t\t\t\t\tAvailable Deluxe Buses:\n";
             for(int i = 0; i < deluxeCount; i++)
             {
-                cout<<i + 1 << ". "<< deluxeBuses[i].getBusNo()<< " - "<< deluxeBuses[i].getRoute()<< endl;
+                cout<<"\t\t\t\t\t\t\t\t"<<i + 1 << ". "<< deluxeBuses[i].getBusNo()<< " - "<< deluxeBuses[i].getRoute()<< endl;
             }
             int busChoice;
-            cout<<"\nSelect Bus: ";
+            cout<<"\n\t\t\t\t\t\t\t\tSelect Bus: ";
             if(!(cin >> busChoice))
             {
                 cin.clear();
                 cin.ignore(1000, '\n');
-                cout<<"Invalid input! Please enter a number.\n";
+                cout<<"\t\t\t\t\t\t\t\tInvalid input! Please enter a number.\n";
                 system("pause");
-                return;
+                continue;
             }
             if(busChoice < 1 || busChoice > deluxeCount)
             {
-                cout<<"Invalid bus choice!\n";
+                cout<<"\t\t\t\t\t\t\t\tInvalid bus choice!\n";
                 system("pause");
-                return;
+                continue;
             }
             deluxeBuses[busChoice - 1].showSeatMap();
         }
@@ -488,7 +501,7 @@ void Bus :: viewseat_map()
         }
         else
         {
-            cout<<"\nInvalid choice!\n";
+            cout<<"\n\t\t\t\t\t\t\t\tInvalid choice!\n";
             system("pause");
             continue;
         }
@@ -498,8 +511,8 @@ bool Bus :: bookSeat(int seat, string name)
 {
     if(seat < 1 || seat > Seats)
     {
-        cout<<"\nInvalid seat number!\n";
-        cout<<"\nSeat number must be between 1 and 40.";
+        cout<<"\n\t\t\t\t\t\t\t\tInvalid seat number!\n";
+        cout<<"\n\t\t\t\t\t\t\t\tSeat number must be between 1 and 40.";
         return false;
     }
     if(seatBooked[seat - 1])
@@ -514,17 +527,17 @@ void Bus :: cancelSeat(int seat)
 {
     if(seat < 1 || seat > Seats)
     {
-        cout<<"\nInvalid seat number!\n";
+        cout<<"\n\t\t\t\t\t\t\t\tInvalid seat number!\n";
         return;
     }
     if(!seatBooked[seat - 1])
     {
-        cout<<"\nThis seat is not booked!\n";
+        cout<<"\n\t\t\t\t\t\t\t\tThis seat is not booked!\n";
         return;
     }
     seatBooked[seat - 1] = false;
     passenger[seat - 1] = "";
-    cout<<"\nSeat "<<seat<<" has been cancelled successfully!\n";
+    cout<<"\n\t\t\t\t\t\t\t\tSeat "<<seat<<" has been cancelled successfully!\n";
 }
 void Bus :: cancelTicket()
 {
@@ -533,18 +546,18 @@ void Bus :: cancelTicket()
         system("cls");
         if(ticketCount == 0)
         {
-            cout<<"\nNo tickets available to cancel!\n";
+            cout<<"\n\t\t\t\t\t\t\t\tNo tickets available to cancel!\n";
             system("pause");
             return;
         }
         int ticketNo;
-        cout<<"\nCANCEL TICKET \n";
-        cout<<"Enter Ticket Number: ";
+        cout<<"\n\t\t\t\t\t\t\t\tCANCEL TICKET \n\n";
+        cout<<"\t\t\t\t\t\t\t\tEnter Ticket Number: ";
         if(!(cin >> ticketNo))
         {
             cin.clear();
             cin.ignore(1000, '\n');
-            cout<<"Invalid input! Please enter a number.\n";
+            cout<<"\t\t\t\t\t\t\t\tInvalid input! Please enter a number.\n";
             system("pause");
             continue;
         }
@@ -559,28 +572,28 @@ void Bus :: cancelTicket()
         }
         if(ticketIndex == -1)
         {
-            cout<<"\nTicket not found!\n";
+            cout<<"\n\t\t\t\t\t\t\t\tTicket not found!\n";
             system("pause");
             continue;
         }
-        cout<<"TICKET DETAILS"<<endl;
-        cout<<"Ticket No.     : " << tickets[ticketIndex].getTicketNo() << endl;
-        cout<<"Bus No.        : " << tickets[ticketIndex].getBusNo() << endl;
-        cout<<"Seat No.       : " << tickets[ticketIndex].getSeatNo() << endl;
-        cout<<"Passenger Name : " << tickets[ticketIndex].getPassengerName() << endl;
-        cout<<"Fare           : Rs. " << fixed << setprecision(2) << tickets[ticketIndex].getFare() << endl;
+        cout<<"\t\t\t\t\t\t\t\t\tTICKET DETAILS"<<endl;
+        cout<<"\t\t\t\t\t\t\t\tTicket No.     : " << tickets[ticketIndex].getTicketNo() << endl;
+        cout<<"\t\t\t\t\t\t\t\tBus No.        : " << tickets[ticketIndex].getBusNo() << endl;
+        cout<<"\t\t\t\t\t\t\t\tSeat No.       : " << tickets[ticketIndex].getSeatNo() << endl;
+        cout<<"\t\t\t\t\t\t\t\tPassenger Name : " << tickets[ticketIndex].getPassengerName() << endl;
+        cout<<"\t\t\t\t\t\t\t\tFare           : Rs. " << fixed << setprecision(2) << tickets[ticketIndex].getFare() << endl;
         char confirm;
-        cout<<"\nAre you sure you want to cancel this ticket? (Y/N): ";
+        cout<<"\n\t\t\t\t\tAre you sure you want to cancel this ticket? (Y/N): ";
         cin>>confirm;
         if(confirm == 'N' || confirm == 'n')
         {
-            cout<<"\nTicket cancellation cancelled.\n";
+            cout<<"\n\t\t\t\t\t\t\t\tTicket cancellation cancelled.\n";
             system("pause");
             return;
         }
         if(confirm != 'Y' && confirm != 'y')
         {
-            cout<<"\nInvalid choice! Please enter Y or N.\n";
+            cout<<"\n\t\t\t\t\t\t\t\tInvalid choice! Please enter Y or N.\n";
             system("pause");
             continue;
         }
@@ -610,7 +623,7 @@ void Bus :: cancelTicket()
         }
         if(!seatCancelled)
         {
-            cout<<"\nBus associated with this ticket was not found!\n";
+            cout<<"\n\t\t\t\t\t\t\t\tBus associated with this ticket was not found!\n";
             system("pause");
             continue;
         }
@@ -620,7 +633,7 @@ void Bus :: cancelTicket()
         }
         ticketCount--;
         saveData();
-        cout<<"\nTicket "<<ticketNo<<" cancelled successfully!\n";
+        cout<<"\n\t\t\t\t\t\t\t\tTicket "<<ticketNo<<" cancelled successfully!\n";
         system("pause");
         return;
     }
@@ -632,33 +645,33 @@ void Bus :: searchTicket()
         system("cls");
         if(ticketCount == 0)
         {
-            cout<<"\nNo tickets available!\n";
+            cout<<"\n\t\t\t\t\t\t\t\tNo tickets available!\n";
             system("pause");
             return;
         }
         int choice;
-        cout<<"\n SEARCH TICKET \n";
-        cout<<"1. Search by Ticket Number\n";
-        cout<<"2. Search by Passenger Name\n";
-        cout<<"3. Back\n";
-        cout<<"Enter your choice: ";
+        cout<<"\n\t\t\t\t\t\t\t\tSEARCH TICKET \n";
+        cout<<"\t\t\t\t\t\t\t\t1. Search by Ticket Number\n";
+        cout<<"\t\t\t\t\t\t\t\t2. Search by Passenger Name\n";
+        cout<<"\t\t\t\t\t\t\t\t3. Back\n";
+        cout<<"\n\t\t\t\t\t\t\t\tEnter your choice: ";
         if(!(cin >> choice))
         {
             cin.clear();
             cin.ignore(1000, '\n');
-            cout<<"Invalid input!\n";
+            cout<<"\t\t\t\t\t\t\t\tInvalid input!\n";
             system("pause");
             continue;
         }
         if(choice == 1)
         {
             int ticketNo;
-            cout<<"\nEnter Ticket Number: ";
+            cout<<"\n\t\t\t\t\t\t\t\tEnter Ticket Number: ";
             if(!(cin >> ticketNo))
             {
                 cin.clear();
                 cin.ignore(1000, '\n');
-                cout<<"Invalid ticket number!\n";
+                cout<<"\t\t\t\t\t\t\t\tInvalid ticket number!\n";
                 system("pause");
                 continue;
             }
@@ -667,18 +680,18 @@ void Bus :: searchTicket()
             {
                 if(tickets[i].getTicketNo() == ticketNo)
                 {
-                    cout<<"\n TICKET DETAILS \n";
-                    cout<<"Ticket Number   : "<<tickets[i].getTicketNo()<<endl;
-                    cout<<"Bus Number      : "<<tickets[i].getBusNo()<<endl;
-                    cout<<"Seat Number     : "<<tickets[i].getSeatNo()<<endl;
-                    cout<<"Passenger Name  : "<<tickets[i].getPassengerName()<<endl;
-                    cout<<"Fare            : Rs. "<<fixed<<setprecision(2)<<tickets[i].getFare()<<endl;
+                    cout<<"\n\t\t\t\t\t\t\t\tTICKET DETAILS \n\n";
+                    cout<<"\t\t\t\t\t\t\t\tTicket Number   : "<<tickets[i].getTicketNo()<<endl;
+                    cout<<"\t\t\t\t\t\t\t\tBus Number      : "<<tickets[i].getBusNo()<<endl;
+                    cout<<"\t\t\t\t\t\t\t\tSeat Number     : "<<tickets[i].getSeatNo()<<endl;
+                    cout<<"\t\t\t\t\t\t\t\tPassenger Name  : "<<tickets[i].getPassengerName()<<endl;
+                    cout<<"\t\t\t\t\t\t\t\tFare            : Rs. "<<fixed<<setprecision(2)<<tickets[i].getFare()<<endl;
                     found = true;
                     break;
                 }
             }
             if(!found)
-                cout<<"\nTicket not found!\n";
+                cout<<"\n\t\t\t\t\t\t\t\tTicket not found!\n";
 
             system("pause");
         }
@@ -688,30 +701,30 @@ void Bus :: searchTicket()
             string name;
             while(true)
             {
-                cout<<"\nEnter Passenger Name: ";
+                cout<<"\n\t\t\t\t\t\t\t\tEnter Passenger Name: ";
                 getline(cin, name);
                 if(validName(name))
                 {
                     break;
                 }
-                cout<<"Invalid name! Only letters and spaces are allowed.\n";
+                cout<<"\t\t\t\t\t\t\t\tInvalid name! Only letters and spaces are allowed.\n";
             }
             bool found = false;
-            cout<<"\n SEARCH RESULTS \n";
+            cout<<"\n\t\t\t\t\tSEARCH RESULTS \n";
             for(int i = 0; i < ticketCount; i++)
             {
                 if(tickets[i].getPassengerName() == name)
                 {
-                    cout<<"\nTicket Number   : "<<tickets[i].getTicketNo();
-                    cout<<"\nBus Number      : "<<tickets[i].getBusNo();
-                    cout<<"\nSeat Number     : "<<tickets[i].getSeatNo();
-                    cout<<"\nPassenger Name  : "<<tickets[i].getPassengerName();
-                    cout<<"\nFare            : Rs. "<<fixed<<setprecision(2)<<tickets[i].getFare()<<endl;
+                    cout<<"\n\t\t\t\t\t\t\t\tTicket Number   : "<<tickets[i].getTicketNo();
+                    cout<<"\n\t\t\t\t\t\t\t\tBus Number      : "<<tickets[i].getBusNo();
+                    cout<<"\n\t\t\t\t\t\t\t\tSeat Number     : "<<tickets[i].getSeatNo();
+                    cout<<"\n\t\t\t\t\t\t\t\tPassenger Name  : "<<tickets[i].getPassengerName();
+                    cout<<"\n\t\t\t\t\t\t\t\tFare            : Rs. "<<fixed<<setprecision(2)<<tickets[i].getFare()<<endl;
                     found = true;
                 }
             }
             if(!found)
-                cout<<"\nNo ticket found for this passenger name.\n";
+                cout<<"\n\t\t\t\t\t\t\t\tNo ticket found for this passenger name.\n";
 
             system("pause");
         }
@@ -721,17 +734,17 @@ void Bus :: searchTicket()
         }
         else
         {
-            cout<<"\nInvalid choice!\n";
+            cout<<"\n\t\t\t\t\t\t\t\tInvalid choice!\n";
             system("pause");
         }
     }
 }
 void Bus :: saveData()
 {
-    ofstream file("D:\\LOQ\\bus_data.txt");
+    ofstream file("D:\\LOQ\\bus.txt");
     if(!file)
     {
-        cout<<"\nError opening file for saving!\n";
+        cout<<"\n\t\t\t\t\t\t\t\tError opening file for saving!\n";
         return;
     }
     file<<normalCount << endl;
@@ -743,8 +756,8 @@ void Bus :: saveData()
         file<<normalBuses[i].distanceKm << endl;
         for(int j = 0; j < Seats; j++)
         {
-            file << normalBuses[i].seatBooked[j] << endl;
-            file << normalBuses[i].passenger[j] << endl;
+            file<<normalBuses[i].seatBooked[j] << endl;
+            file<<normalBuses[i].passenger[j] << endl;
         }
     }
     for(int i = 0; i < deluxeCount; i++)
@@ -769,11 +782,11 @@ void Bus :: saveData()
         file<<tickets[i].getFare() << endl;
     }
     file.close();
-    cout<<"\nData saved successfully!\n";
+    cout<<"\n\t\t\t\t\t\t\t\tData saved successfully!\n";
 }
 void Bus :: loadData()
 {
-    ifstream file("D:\\LOQ\\bus_data.txt");
+    ifstream file("D:\\LOQ\\bus.txt");
     if(!file)
     {
         return;
@@ -783,7 +796,7 @@ void Bus :: loadData()
     if(normalCount < 0 || normalCount > Max_Bus ||
        deluxeCount < 0 || deluxeCount > Max_Bus)
     {
-        cout<<"\nInvalid bus data found in file!\n";
+        cout<<"\n\t\t\t\t\t\t\t\tInvalid bus data found in file!\n";
         normalCount = 0;
         deluxeCount = 0;
         ticketCount = 0;
@@ -821,7 +834,7 @@ void Bus :: loadData()
     file>>ticketCount;
     if(ticketCount < 1 || ticketCount > Max_Tickets)
     {
-        cout<<"\nInvalid ticket data found in file!\n";
+        cout<<"\n\t\t\t\t\t\t\t\tInvalid ticket data found in file!\n";
         ticketCount = 0;
         nextTicketNo = 1;
         file.close();
@@ -855,21 +868,21 @@ void Bus :: bookTicket()
         system("cls");
         if(normalCount == 0 && deluxeCount == 0)
         {
-            cout<<"\nNo buses available!\n";
+            cout<<"\n\t\t\t\t\t\t\t\tNo buses available!\n";
             system("pause");
             return;
         }
         int type;
-        cout<<"\n========== BOOK TICKET ==========\n";
-        cout<<"1. Normal Bus\n";
-        cout<<"2. Deluxe Bus\n";
-        cout<<"3. Back\n";
-        cout<<"Enter your choice: ";
+        cout<<"\n\t\t\t\t\t\t\t\tBOOK TICKET \n";
+        cout<<"\t\t\t\t\t\t\t\t1. Normal Bus\n";
+        cout<<"\t\t\t\t\t\t\t\t2. Deluxe Bus\n";
+        cout<<"\t\t\t\t\t\t\t\t3. Back\n";
+        cout<<"\n\t\t\t\t\t\t\t\tEnter your choice: ";
         if(!(cin >> type))
         {
             cin.clear();
             cin.ignore(1000, '\n');
-            cout<<"Invalid input! Please enter a number.\n";
+            cout<<"\t\t\t\t\t\t\t\tInvalid input! Please enter a number.\n";
             system("pause");
             return;
         }
@@ -877,28 +890,28 @@ void Bus :: bookTicket()
         {
             if(normalCount == 0)
             {
-                cout<<"\nNo Normal Bus available!\n";
+                cout<<"\n\t\t\t\t\t\t\t\tNo Normal Bus available!\n";
                 system("pause");
                 continue;
             }
-            cout<<"\nAvailable Normal Buses:\n";
+            cout<<"\n\t\t\t\t\t\t\t\tAvailable Normal Buses:\n";
             for(int i = 0; i < normalCount; i++)
             {
                 cout<<i + 1 << ". "<< normalBuses[i].getBusNo()<< " - "<< normalBuses[i].getRoute()<< endl;
             }
             int busChoice;
-            cout<<"\nSelect Bus: ";
+            cout<<"\n\t\t\t\t\t\t\t\tSelect Bus: ";
             if(!(cin >> busChoice))
             {
                 cin.clear();
                 cin.ignore(1000, '\n');
-                cout<<"Invalid input! Please enter a number.\n";
+                cout<<"\t\t\t\t\t\t\t\tInvalid input! Please enter a number.\n";
                 system("pause");
                 return;
             }
             if(busChoice < 1 || busChoice > normalCount)
             {
-                cout<<"Invalid bus choice!\n";
+                cout<<"\t\t\t\t\t\t\t\tInvalid bus choice!\n";
                 system("pause");
                 return;
             }
@@ -907,12 +920,12 @@ void Bus :: bookTicket()
             int seat;
             while(true)
             {
-                cout<<"\nEnter Seat Number (1-40): ";
+                cout<<"\n\t\t\t\t\t\t\t\tEnter Seat Number (1-40): ";
                 if(cin>>seat && seat >= 1 && seat <= 40)
                 {
                     break;
                 }
-                cout<<"Invalid seat number! Please enter a number between 1 and 40.\n";
+                cout<<"\t\t\t\t\t\t\t\tInvalid seat number! Please enter a number between 1 and 40.\n";
                 cin.clear();
                 cin.ignore(1000, '\n');
             }
@@ -920,17 +933,17 @@ void Bus :: bookTicket()
             string name;
             while(true)
             {
-                cout<<"Enter Passenger Name: ";
+                cout<<"\t\t\t\t\t\t\t\tEnter Passenger Name: ";
                 getline(cin, name);
                 if(validName(name))
                 {
                     break;
                 }
-                cout<<"Invalid passenger name! Only letters and spaces are allowed.\n";
+                cout<<"\t\t\t\t\t\t\t\tInvalid passenger name! Only letters and spaces are allowed.\n";
             }
             if(ticketCount >= Max_Tickets)
             {
-                cout<<"\nTicket limit reached! Cannot book more tickets.\n";
+                cout<<"\n\t\t\t\t\t\t\t\tTicket limit reached! Cannot book more tickets.\n";
                 system("pause");
                 return;
             }
@@ -943,11 +956,11 @@ void Bus :: bookTicket()
                 }
                 double fare = selectedBus.farePerSeat();
                 tickets[ticketCount] = Ticket(nextTicketNo,selectedBus.getBusNo(),seat,name,fare);
-                cout<<"\nTicket Number : "<<nextTicketNo<<endl;
-                cout<<"Bus Number    : "<<selectedBus.getBusNo()<<endl;
-                cout<<"Seat Number   : "<<seat<<endl;
-                cout<<"Passenger     : "<<name<<endl;
-                cout<<"Fare          : "<<fare<<endl;
+                cout<<"\n\t\t\t\t\t\t\t\tTicket Number : "<<nextTicketNo<<endl;
+                cout<<"\t\t\t\t\t\t\t\tBus Number    : "<<selectedBus.getBusNo()<<endl;
+                cout<<"\t\t\t\t\t\t\t\tSeat Number   : "<<seat<<endl;
+                cout<<"\t\t\t\t\t\t\t\tPassenger     : "<<name<<endl;
+                cout<<"\t\t\t\t\t\t\t\tFare          : "<<fare<<endl;
                 ticketCount++;
                 nextTicketNo++;
                 saveData();
@@ -961,28 +974,28 @@ void Bus :: bookTicket()
         {
             if(deluxeCount == 0)
             {
-                cout<<"\nNo Deluxe Bus available!\n";
+                cout<<"\n\t\t\t\t\t\t\t\tNo Deluxe Bus available!\n";
                 system("pause");
                 continue;
             }
-            cout<<"\nAvailable Deluxe Buses:\n";
+            cout<<"\n\t\t\t\t\t\t\t\tAvailable Deluxe Buses:\n";
             for(int i = 0; i < deluxeCount; i++)
             {
                 cout << i + 1 << ". "<< deluxeBuses[i].getBusNo()<< " - "<< deluxeBuses[i].getRoute()<< endl;
             }
             int busChoice;
-            cout<<"\nSelect Bus: ";
+            cout<<"\n\t\t\t\t\t\t\t\tSelect Bus: ";
             if(!(cin >> busChoice))
             {
                 cin.clear();
                 cin.ignore(1000, '\n');
-                cout<<"Invalid input! Please enter a number.\n";
+                cout<<"\t\t\t\t\t\t\t\tInvalid input! Please enter a number.\n";
                 system("pause");
                 return;
             }
             if(busChoice < 1 || busChoice > deluxeCount)
             {
-                cout<<"Invalid bus choice!\n";
+                cout<<"\t\t\t\t\t\t\t\tInvalid bus choice!\n";
                 system("pause");
                 return;
             }
@@ -991,12 +1004,12 @@ void Bus :: bookTicket()
             int seat;
             while(true)
             {
-                cout<<"\nEnter Seat Number (1-40): ";
+                cout<<"\n\t\t\t\t\t\t\t\tEnter Seat Number (1-40): ";
                 if(cin>>seat && seat >= 1 && seat <= 40)
                 {
                     break;
                 }
-                cout<<"Invalid seat number! Please enter a number between 1 and 40.\n";
+                cout<<"\t\t\t\t\t\t\t\tInvalid seat number! Please enter a number between 1 and 40.\n";
                 cin.clear();
                 cin.ignore(1000, '\n');
             }
@@ -1004,17 +1017,17 @@ void Bus :: bookTicket()
             string name;
             while(true)
             {
-                cout<<"Enter Passenger Name: ";
+                cout<<"\t\t\t\t\t\t\t\tEnter Passenger Name: ";
                 getline(cin, name);
                 if(validName(name))
                 {
                     break;
                 }
-                cout<<"Invalid passenger name! Only letters and spaces are allowed.\n";
+                cout<<"\t\t\t\t\t\t\t\tInvalid passenger name! Only letters and spaces are allowed.\n";
             }
             if(ticketCount >= Max_Tickets)
             {
-                cout<<"\nTicket limit reached! Cannot book more tickets.\n";
+                cout<<"\n\t\t\t\t\t\t\t\tTicket limit reached! Cannot book more tickets.\n";
                 system("pause");
                 return;
             }
@@ -1027,11 +1040,11 @@ void Bus :: bookTicket()
                 }
                 double fare = selectedBus.farePerSeat();
                 tickets[ticketCount] = Ticket(nextTicketNo,selectedBus.getBusNo(),seat,name,fare);
-                cout<<"\nTicket Number : "<<nextTicketNo<<endl;
-                cout<<"Bus Number    : "<<selectedBus.getBusNo()<<endl;
-                cout<<"Seat Number   : "<<seat<<endl;
-                cout<<"Passenger     : "<<name<<endl;
-                cout<<"Fare          : "<<fare<<endl;
+                cout<<"\n\t\t\t\t\t\t\t\tTicket Number : "<<nextTicketNo<<endl;
+                cout<<"\t\t\t\t\t\t\t\tBus Number    : "<<selectedBus.getBusNo()<<endl;
+                cout<<"\t\t\t\t\t\t\t\tSeat Number   : "<<seat<<endl;
+                cout<<"\t\t\t\t\t\t\t\tPassenger     : "<<name<<endl;
+                cout<<"\t\t\t\t\t\t\t\tFare          : "<<fare<<endl;
                 ticketCount++;
                 nextTicketNo++;
                 saveData();
@@ -1047,7 +1060,7 @@ void Bus :: bookTicket()
         }
         else
         {
-            cout<<"\nInvalid choice!\n";
+            cout<<"\n\t\t\t\t\t\t\t\tInvalid choice!\n";
         }
         system("pause");
         continue;
@@ -1071,26 +1084,26 @@ void signup()
     while(true)
     {
         system("cls");
-        cout<<"\n SIGNUP \n";
-        cout<<"Username: ";
+        cout<<"\n\t\t\t\t\t\t\t\t\tSIGNUP \n";
+        cout<<"\t\t\t\t\t\t\t\tUsername: ";
         cin>>u;
         if(validUsername(u))
             break;
-        cout<<"Invalid username! Letters only.\n";
+        cout<<"\t\t\t\t\t\t\t\tInvalid username! Letters only.\n";
     }
     while(true)
     {
-        cout<<"Password: ";
+        cout<<"\t\t\t\t\t\t\t\tPassword: ";
         cin>>p;
         if(validPassword(p))
             break;
 
-        cout<<"Password must be at least 4 characters!\n";
+        cout<<"\t\t\t\t\t\t\t\tPassword must be at least 4 characters!\n";
     }
     ofstream f("D:\\LOQ\\login.txt",ios::app);
     f<<u<<endl<<p<<endl;
     f.close();
-    cout<<"Account created successfully!\n";
+    cout<<"\t\t\t\t\t\t\t\tAccount created successfully!\n";
     system("pause");
 }
 bool login()
@@ -1099,26 +1112,26 @@ bool login()
     ifstream f("D:\\LOQ\\login.txt");
     if(!f)
     {
-        cout<<"\nNo account found! Please Sign Up First.\n";
+        cout<<"\n\t\t\t\t\t\t\t\tNo account found! Please Sign Up First.\n";
         system("pause");
         return false;
     }
     system("cls");
-    cout<<"\n LOGIN \n";
-    cout<<"Username: ";
+    cout<<"\n\t\t\t\t\t\t\t\t\tLOGIN \n";
+    cout<<"\n\t\t\t\t\t\t\t\tUsername: ";
     cin>>u;
-    cout<<"Password: ";
+    cout<<"\t\t\t\t\t\t\t\tPassword: ";
     cin>>p;
     while(getline(f,su))
     {
         getline(f,sp);
         if(u==su && p==sp)
         {
-            cout<<"\nLogin successful!\n";
+            cout<<"\n\t\t\t\t\t\t\t\tLogin successful!\n";
             return true;
         }
     }
-    cout<<"\nInvalid username or password!\n";
+    cout<<"\n\t\t\t\t\t\t\t\tInvalid username or password!\n";
     system("pause");
     return false;
 }
@@ -1127,17 +1140,17 @@ void accountMenu()
     while(true)
     {
         system("cls");
-        cout<<"\n LOGIN FOR TICKET RESERVATION \n";
-        cout<<"1. Sign Up\n";
-        cout<<"2. Login\n";
-        cout<<"3. Exit\n";
-        cout<<"Enter choice: ";
+        cout<<"\n\t\t\t\t\t\t\t\tLOGIN FOR TICKET RESERVATION\n\n";
+        cout<<"\t\t\t\t\t\t\t\t1. Sign Up\n";
+        cout<<"\t\t\t\t\t\t\t\t2. Login\n";
+        cout<<"\t\t\t\t\t\t\t\t3. Exit\n";
+        cout<<"\n\t\t\t\t\t\t\t\tEnter choice: ";
         int choice;
         if(!(cin>>choice))
         {
             cin.clear();
             cin.ignore(1000,'\n');
-            cout<<"Invalid input! Enter a number.\n";
+            cout<<"\t\t\t\t\t\t\t\tInvalid input! Enter a number.\n";
             system("pause");
             continue;
         }
@@ -1153,7 +1166,7 @@ void accountMenu()
             case 3:
                 exit(0);
             default:
-                cout<<"Invalid choice! Choose 1-3.\n";
+                cout<<"\t\t\t\t\t\t\t\tInvalid choice! Choose 1-3.\n";
                 system("pause");
         }
     }
@@ -1163,20 +1176,20 @@ void Bus ::menu()
     p:
     system("cls");
     int choice;
-    cout<<"Menu"<<endl;
-    cout<<"1. Add Bus"<<endl;
-    cout<<"2. List Buses"<<endl;
-    cout<<"3. View Seat Map"<<endl;
-    cout<<"4. Book ticket"<<endl;
-    cout<<"5. Cancel Ticket"<<endl;
-    cout<<"6. Search Ticket"<<endl;
-    cout<<"7. Save & Exit"<<endl;
-    cout<<"Enter Your choice: ";
+    cout<<"\t\t\t\t\t\t\t\t\tMain Menu"<<endl<<endl;
+    cout<<"\t\t\t\t\t\t\t\t1. Add Bus"<<endl;
+    cout<<"\t\t\t\t\t\t\t\t2. List Buses"<<endl;
+    cout<<"\t\t\t\t\t\t\t\t3. View Seat Map"<<endl;
+    cout<<"\t\t\t\t\t\t\t\t4. Book ticket"<<endl;
+    cout<<"\t\t\t\t\t\t\t\t5. Cancel Ticket"<<endl;
+    cout<<"\t\t\t\t\t\t\t\t6. Search Ticket"<<endl;
+    cout<<"\t\t\t\t\t\t\t\t7. Save & Exit"<<endl;
+    cout<<"\n\t\t\t\t\t\t\t\tEnter Your choice: ";
     if(!(cin >> choice))
     {
         cin.clear();
         cin.ignore(1000, '\n');
-        cout<<"Invalid choice! Please enter a number.\n";
+        cout<<"\t\t\t\t\t\t\t\tInvalid choice! Please enter a number.\n";
         system("pause");
         goto p;
     }
@@ -1205,7 +1218,7 @@ void Bus ::menu()
             system("pause");
             return;
         default:
-            cout<<endl<<"Invalid Choice! Please Try Again"<<endl;
+            cout<<endl<<"\t\t\t\t\t\t\t\tInvalid Choice! Please Try Again"<<endl;
             system("pause");
     }
     goto p;
