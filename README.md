@@ -1,4 +1,4 @@
-# Bus Ticket Reservation System     KAILASH SHRESTHA
+# Bus Ticket Reservation System
 
 A simple system that lets passengers book bus tickets online.
 
