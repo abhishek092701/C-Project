@@ -517,7 +517,7 @@ bool Bus :: bookSeat(int seat, string name)
     }
     if(seatBooked[seat - 1])
     {
-        throw SeatAlreadyBookedException("Seat " + to_string(seat) + " is already booked!");
+        throw SeatAlreadyBookedException("\t\t\t\t\t\t\t\t""Seat " + to_string(seat) + " is already booked!");
     }
     seatBooked[seat - 1] = true;
     passenger[seat - 1] = name;
@@ -897,7 +897,7 @@ void Bus :: bookTicket()
             cout<<"\n\t\t\t\t\t\t\t\tAvailable Normal Buses:\n";
             for(int i = 0; i < normalCount; i++)
             {
-                cout<<i + 1 << ". "<< normalBuses[i].getBusNo()<< " - "<< normalBuses[i].getRoute()<< endl;
+                cout<<"\t\t\t\t\t\t\t\t"<<i + 1 << ". "<< normalBuses[i].getBusNo()<< " - "<< normalBuses[i].getRoute()<< endl;
             }
             int busChoice;
             cout<<"\n\t\t\t\t\t\t\t\tSelect Bus: ";
@@ -981,7 +981,7 @@ void Bus :: bookTicket()
             cout<<"\n\t\t\t\t\t\t\t\tAvailable Deluxe Buses:\n";
             for(int i = 0; i < deluxeCount; i++)
             {
-                cout << i + 1 << ". "<< deluxeBuses[i].getBusNo()<< " - "<< deluxeBuses[i].getRoute()<< endl;
+                cout<<"\t\t\t\t\t\t\t\t"<< i + 1 << ". "<< deluxeBuses[i].getBusNo()<< " - "<< deluxeBuses[i].getRoute()<< endl;
             }
             int busChoice;
             cout<<"\n\t\t\t\t\t\t\t\tSelect Bus: ";
