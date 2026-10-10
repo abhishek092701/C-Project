@@ -255,9 +255,9 @@ void Bus :: list_buses()
     {
         for(int i = 0; i < normalCount; i++)
         {
-            cout<<"\n\t\t\t\t\tBus No       : "<<normalBuses[i].getBusNo();
-            cout<<"\n\t\t\t\t\tRoute        : "<<normalBuses[i].getRoute();
-            cout<<"\n\t\t\t\t\tDistance     : "<<normalBuses[i].getDistance() << " KM\n";
+            cout<<"\n\t\t\t\t\t\t\t\tBus No       : "<<normalBuses[i].getBusNo();
+            cout<<"\n\t\t\t\t\t\t\t\tRoute        : "<<normalBuses[i].getRoute();
+            cout<<"\n\t\t\t\t\t\t\t\tDistance     : "<<normalBuses[i].getDistance() << " KM\n";
         }
     }
     cout<<"\n \t\t\t\t\t\t\t\t\tDELUXE BUSES \n";
@@ -576,14 +576,14 @@ void Bus :: cancelTicket()
             system("pause");
             continue;
         }
-        cout<<"\t\t\t\t\t\t\t\t\tTICKET DETAILS"<<endl;
+        cout<<"\n\t\t\t\t\t\t\t\t\tTICKET DETAILS"<<endl<<endl;
         cout<<"\t\t\t\t\t\t\t\tTicket No.     : " << tickets[ticketIndex].getTicketNo() << endl;
         cout<<"\t\t\t\t\t\t\t\tBus No.        : " << tickets[ticketIndex].getBusNo() << endl;
         cout<<"\t\t\t\t\t\t\t\tSeat No.       : " << tickets[ticketIndex].getSeatNo() << endl;
         cout<<"\t\t\t\t\t\t\t\tPassenger Name : " << tickets[ticketIndex].getPassengerName() << endl;
         cout<<"\t\t\t\t\t\t\t\tFare           : Rs. " << fixed << setprecision(2) << tickets[ticketIndex].getFare() << endl;
         char confirm;
-        cout<<"\n\t\t\t\t\tAre you sure you want to cancel this ticket? (Y/N): ";
+        cout<<"\n\t\t\t\t\t\t\tAre you sure you want to cancel this ticket? (Y/N): ";
         cin>>confirm;
         if(confirm == 'N' || confirm == 'n')
         {
@@ -710,7 +710,7 @@ void Bus :: searchTicket()
                 cout<<"\t\t\t\t\t\t\t\tInvalid name! Only letters and spaces are allowed.\n";
             }
             bool found = false;
-            cout<<"\n\t\t\t\t\tSEARCH RESULTS \n";
+            cout<<"\n\t\t\t\t\t\t\t\tSEARCH RESULTS \n";
             for(int i = 0; i < ticketCount; i++)
             {
                 if(tickets[i].getPassengerName() == name)
